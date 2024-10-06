@@ -1,5 +1,5 @@
 #if defined _bwa_utility__
-  #endinput
+	#endinput
 #endif
 #define _bwa_utility__
 

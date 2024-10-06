@@ -1,5 +1,5 @@
 #if defined _bwa_filters__
-  #endinput
+	#endinput
 #endif
 #define _bwa_filters__
 
