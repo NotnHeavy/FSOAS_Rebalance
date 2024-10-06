@@ -1,19 +1,18 @@
-/**
- * FSOAS Rebalance Plugin (aka. Bad Weapon Rehabilitation)
- * https://badweaponrehab.tf/
-*/
-
-#pragma newdecls required
-#pragma semicolon 1
-
 #include <sourcemod>
 #include <sdkhooks>
 #include <tf2>
 #include <tf2_stocks>
-
-#include "third_party/tf2attributes"
-#include "third_party/tf2condhooks"
-#include "third_party/tf2utils"
+/*
+#include <tf2attributes>
+#include <tf2condhooks>
+#include <tf2utils>
+*/
+#include <third_party/tf2attributes>
+#include <third_party/tf2condhooks>
+#include <third_party/tf2utils>
+#pragma newdecls required
+#pragma semicolon 1
+#define VDECODE_FLAG_ALLOWWORLD  (1<<2)
 
 ConVar g_bEnablePlugin; // Convar that enables plugin
 ConVar g_bApplyClassChangesToBots; // Convar that decides if attributes should apply to bots.
