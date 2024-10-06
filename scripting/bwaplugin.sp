@@ -15,12 +15,15 @@
 #include "third_party/tf2condhooks"
 #include "third_party/tf2utils"
 
+#include "rebalance/utility.sp"
+#include "rebalance/filters.sp"
+
 ConVar g_bEnablePlugin; // Convar that enables plugin
 ConVar g_bApplyClassChangesToBots; // Convar that decides if attributes should apply to bots.
 ConVar g_bApplyClassChangesToMvMBots; // Convar that decides if attributes should apply to MvM bots.
 
 Handle g_hSDKFinishBuilding;
-Handle g_Maplist = INVALID_HANDLE;
+Handle g_Maplist;
 
 bool g_bIsMVM = false; // Is the mode MvM?
 bool IS_MEDIEVAL = false;
@@ -4802,7 +4805,7 @@ public Action OnPlayerRunCmd(int iClient, int &buttons, int &impulse, float vel[
 							// CreateParticle(iClient,"Explosions_MA_Smoke_1",2.0,_,_,_,_,100.0,1.5,false);
 							// CreateParticle(iClient,"mvm_pow_test",2.0,_,exAngle,_,_,100.0,1.5,false);
 							CreateParticle(iClient,"mvm_loot_dustup",2.0,_,exAngle,_,_,100.0,1.5,false);
-							int rndact = GetRandomUInt(0,3);
+							int rndact = GetRandomInt(0,3);
 							switch(rndact)
 							{
 								case 0: EmitAmbientSound("vo/taunts/demo/taunt_demo_exert_04.mp3",position,iClient);
@@ -5129,7 +5132,7 @@ public Action OnPlayerRunCmd(int iClient, int &buttons, int &impulse, float vel[
 				// 			g_meterSec[iClient] = 100.0;
 				// 			TeleportEntity(iClient,_,_,currVel);
 				// 			g_condFlags[iClient] |= TF_CONDFLAG_DIVE;
-				// 			int rndact = GetRandomUInt(0,2);
+				// 			int rndact = GetRandomInt(0,2);
 				// 			if(rndact==2)
 				// 			{
 				// 				EmitSoundToClient(iClient,"vo/taunts/soldier/soldier_taunt_flip_fun_04.mp3");
@@ -6318,7 +6321,7 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
 		// 	{
 		// 		damage = 0.1; //reduce fall damage for mantreads
 		// 		g_condFlags[victim] &= ~TF_CONDFLAG_DIVE;
-		// 		int rndact = GetRandomUInt(0,7);
+		// 		int rndact = GetRandomInt(0,7);
 		// 		switch(rndact)
 		// 		{
 		// 			case 0: EmitAmbientSound("vo/soldier_painsharp01.mp3",damagePosition,victim);
@@ -6540,7 +6543,7 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
 		// 		float hp = GetClientHealth(attacker) + 0.0;
 		// 		int max = GetEntProp(GetPlayerResourceEntity(), Prop_Send, "m_iMaxHealth", _, attacker);
 		// 		float portion = (hp/max)*100;
-		// 		int rnd = GetRandomUInt(0,100);
+		// 		int rnd = GetRandomInt(0,100);
 		// 		if(rnd > portion)
 		// 		{
 		// 			damagetype |= DMG_CRIT;
@@ -6599,7 +6602,7 @@ public Action OnTakeDamage(int victim, int &attacker, int &inflictor, float &dam
 						// damage += 10.0;
 						// if(g_condFlags[attacker] & TF_CONDFLAG_DIVE)
 						// {
-						// 	int rndact = GetRandomUInt(0,3);
+						// 	int rndact = GetRandomInt(0,3);
 						// 	char classSound[64];
 						// 	switch(rndact)
 						// 	{ 
@@ -8858,26 +8861,6 @@ public void Switch3rd(int iClient)
 	ClientCommand(iClient,"slot3");
 }
 
-float ValveRemapVal(float val, float a, float b, float c, float d)
-{
-	// https://github.com/ValveSoftware/source-sdk-2013/blob/master/sp/src/public/mathlib/mathlib.h#L648
-	float tmp;
-	if (a == b) return (val >= b ? d : c);
-	tmp = ((val - a) / (b - a));
-	if (tmp < 0.0) tmp = 0.0;
-	if (tmp > 1.0) tmp = 1.0;
-	return (c + (d - c) * tmp);
-}
-
-float CalcViewsOffset(float angle1[3], float angle2[3])
-{
-	float v1, v2;
-	v1 = FloatAbs(angle1[0] - angle2[0]);
-	v2 = FloatAbs(angle1[1] - angle2[1]);
-	v2 = v2 > 180.0 ? (v2 - 360.0) : v2;
-	return SquareRoot(Pow(v1, 2.0) + Pow(v2, 2.0));
-}
-
 Action GasTouch(int gas, int other)
 {
 	if(IsValidClient(other))
@@ -10061,43 +10044,6 @@ void SetAnimation(int client, char[] Animation, int AnimationType, int ClientCom
 	}
 }
 
-bool TraceFilter(int entity, int contentsmask, any data)
-{
-	char class[64];
-	if (entity == data)
-		return false;
-	if (entity <= MaxClients)
-		return false;
-	GetEntityClassname(entity, class, sizeof(class));
-	if (StrContains(class, "obj_") == 0 || StrContains(class, "tf_projectile_") == 0)
-		return false;
-	return true;
-}
-
-bool SimpleTraceFilter(int entity, int contentsMask, any data)
-{
-	if(entity != data)
-		return (false);
-	return (true);
-}
-
-bool PlayerTraceFilter(int entity, int contentsMask, any data)
-{
-	if(entity == data)
-		return (false);
-	if(IsValidClient(entity))
-		return (false);
-	return (true);
-}
-
-float getPlayerDistance(int clientA, int clientB)
-{
-	float clientAPos[3], clientBPos[3];
-	GetEntPropVector(clientA, Prop_Send, "m_vecOrigin", clientAPos);
-	GetEntPropVector(clientB, Prop_Send, "m_vecOrigin", clientBPos);
-	return GetVectorDistance(clientAPos,clientBPos);
-}
-
 bool isKritzed(int client)
 {
 	return (TF2_IsPlayerInCondition(client,TFCond_Kritzkrieged) ||
@@ -10202,23 +10148,4 @@ public Action KillSpooky(Handle timer, int skeleton)
 		AcceptEntityInput(skeleton,"Kill");
 	}
 	return Plugin_Continue;
-}
-
-public bool TraceEntityFilterPlayer(int entity, int contentsMask, any data)
-{
-    return entity == 0 || entity > MaxClients;
-}
-
-int GetRandomUInt(int min, int max)
-{
-	return RoundToFloor(GetURandomFloat() * (max - min + 1)) + min;
-}
-
-float GetMax(float a, float b)
-{
-	return a > b ? a : b;
-}
-float GetMin(float a, float b)
-{
-	return a < b ? a : b;
 }
