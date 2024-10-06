@@ -4,25 +4,10 @@
 	{
 		"Offsets"
 		{
-			"CBaseObject::StartBuilding"
+			"CBaseObject::FinishedBuilding()"
 			{
-				"windows"       "342"
-				"linux"         "344"
-			}
-			"CBaseObject::FinishedBuilding"
-			{
-				"windows"       "343"
-				"linux"         "345"
-			}
-			"CBaseObject::StartUpgrading"
-			{
-				"windows"       "383"
-				"linux"         "384"
-			}
-			"CBaseObject::FinishUpgrading"
-			{
-				"windows"       "384"
-				"linux"         "385"
+				"windows"	"343"
+				"linux"		"345"
 			}
 		}
 	}

@@ -154,7 +154,7 @@ public void OnPluginStart()
 	FCVAR_PROTECTED, true, 0.0, true, 1.0);
 
 	StartPrepSDKCall(SDKCall_Entity);
-	PrepSDKCall_SetFromConf(data, SDKConf_Virtual, "CBaseObject::FinishedBuilding");
+	PrepSDKCall_SetFromConf(data, SDKConf_Virtual, "CBaseObject::FinishedBuilding()");
 	g_hSDKFinishBuilding = EndPrepSDKCall();
 
 	HookEvent("player_spawn", Event_PlayerSpawn);
