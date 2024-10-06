@@ -1,5 +1,5 @@
 # FSOAS Rebalance Plugin
-**aka "Bad Weapon Rehabilitation**
+**Also known as Bad Weapon Rehabiliation.**
 
 Changes: https://badweaponrehab.tf/
 
